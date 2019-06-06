@@ -18,11 +18,14 @@ python -m http.server
 
 3. Open the webpage. Python's http-server defaults to [http://locahost:8000](http://locahost:8000)
 
-## Usage
+## How to play
 
 The controls for the rocket are **A** and **D** for turning, and **SPACE** for throttle.
 
 In addition, you may change simulation variables by using the sliders on the top-left of the screen.
+
+The goal of the game is to land safely. To do so, you need land in a maintaned way, but what does that mean?
+Keep your velocity low, and don't land at too steep of an angle. Thats it!
 
 ## For developers
 ![alt text][logo]
