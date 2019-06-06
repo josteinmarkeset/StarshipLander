@@ -1,6 +1,6 @@
 # Starship Lander
 
-Starship Lander is a rocket landing simulator. The user can control the rocket, and manipulate simulation variables
+Starship Lander is a rocket landing game. The user can control the rocket, and manipulate simulation variables
 .
 ## Installation
 
