@@ -23,3 +23,10 @@ python -m http.server
 The controls for the rocket are **A** and **D** for turning, and **SPACE** for throttle.
 
 In addition, you may change simulation variables by using the sliders on the top-left of the screen.
+
+## For developers
+![alt text][logo]
+
+[logo]: https://github.com/josteinmarkeset/StarshipLander/raw/master/resources/img/class_diagram.jpg "Class Diagram"
+
+The code is structured in various classes. The main class is **World**. At the start of the application, a **World** object is initialized and defines the environment for the entities within it. In it's constructor it initializes all the entities in the simulation. The entities that are spawned by default, is the **Planet** object and the **Rocket** object. These inherit from the root **Entity** class, which defines primitive properties like position and looks. Other classes are **Rigidbody**, **ParticleSystem** and **Particle**.
