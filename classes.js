@@ -12,9 +12,6 @@ class World {
 
         for (const i in this.entities) {
             this.entities[i].update();
-        }
-
-        for (const i in this.entities) {
             this.entities[i].draw();
         }
 
@@ -31,20 +28,18 @@ class World {
 
     updateCollision() {
         for (const i in this.rocket.collisionPoints) {
-            let col = this.testCollision(this.rocket.getCollisionPoint(i));
+            const col = this.testCollision(this.rocket.getCollisionPoint(i));
 
-            let r2d = 180 / Math.PI;
-            let surfaceAngle = col.normal.heading() + Math.PI / 2;
-            let rocketAngle = this.rocket.angle;
-            let angle = rocketAngle - surfaceAngle;
-            let speed = this.rocket.velocity.mag();
-            let canLand = Math.abs(rocketAngle * r2d) < maxLandingAngle && Math.abs(angle * r2d) < maxLandingDelta && speed < maxLandingSpeed;
+            const r2d = 180 / Math.PI; //Radians to degrees
+            const surfaceAngle = col.normal.heading() - Math.PI / 2;
+            const rocketAngle = this.rocket.angle;
+            const angle = rocketAngle - surfaceAngle;
+            const speed = this.rocket.velocity.mag();
+            const canLand = Math.abs(rocketAngle * r2d) < maxLandingAngle && Math.abs(angle * r2d) < maxLandingDelta && speed < maxLandingSpeed;
 
             if (col.distance < 0) {
-                let momentArm = p5.Vector.sub(col.midPoint, p5.Vector.add(this.rocket.position, this.rocket.centerOfMass));
-                momentArm.normalize();
-                let offset = p5.Vector.mult(col.normal, -col.distance);
-                this.rocket.position.add(offset);
+                const offset = p5.Vector.mult(col.normal, col.distance); // How far down in the ground
+                this.rocket.position.add(offset); // Move back to surface
                 this.rocket.velocity.mult(0);
 
                 if (canLand) {
@@ -60,7 +55,7 @@ class World {
             if (window.debug) {
                 if (canLand) stroke('rgb(0, 255, 255)');
                 else stroke('rgb(255, 0, 0)');
-                line(col.midPoint.x, col.midPoint.y, col.midPoint.x + col.normal.x * 20, col.midPoint.y + col.normal.y * 20);
+                line(col.midPoint.x, col.midPoint.y, col.midPoint.x - col.normal.x * 20, col.midPoint.y - col.normal.y * 20);
             }
         }
     }
@@ -77,7 +72,7 @@ class World {
             const p2 = createVector(x2, y2);
 
             const distance = distToSegmentSigned(point, p1, p2);
-            const normal = createVector(y2 - y1, x1 - x2);
+            const normal = createVector(y1 - y2, x2 - x1); // Rotate vector 90 degrees
             normal.normalize();
 
             return {
@@ -200,11 +195,12 @@ class RigidBody extends Entity {
             pop()
         }
 
-        //TODO
-        strokeWeight(5);
-        for (let i in this.collisionPoints) {
-            const pointPosition = this.getCollisionPoint(i);
-            point(pointPosition.x, pointPosition.y);
+        if (window.debug) {
+            strokeWeight(5);
+            for (let i in this.collisionPoints) {
+                const pointPosition = this.getCollisionPoint(i);
+                point(pointPosition.x, pointPosition.y);
+            }
         }
     }
 
