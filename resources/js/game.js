@@ -1,4 +1,6 @@
 // ==========GLOBALS StART ===========
+let enableDebugging = false;
+
 var rocketMass = 85000; // Mass of Starship from: https://en.wikipedia.org/wiki/Starship_(rocket)
 var rocketMassMin = 0;
 var rocketMassMax = 1000000;
@@ -54,8 +56,16 @@ function setup() {
 // Called every frame
 function draw() {
     background(135, 206, 250);
+    window.debug = enableDebugging;
     world.update();
+    // Update delta-time
     lastFrameTime = window.performance.now();
+}
+
+function enableDebug(shouldEnable = true) {
+    enableDebugging = shouldEnable;
+
+    console.log(shouldEnable ? "Debugging mode enabled." : "Debugging mode disabled.");
 }
 
 // Restart

@@ -38,9 +38,9 @@ class World {
             const r2d = 180 / Math.PI; //Radians to degrees
             const surfaceAngle = col.normal.heading() - Math.PI / 2;
             const rocketAngle = this.rocket.angle;
-            const angle = rocketAngle - surfaceAngle;
+            const adjustedSurfaceAngle = rocketAngle - surfaceAngle;
             const speed = this.rocket.velocity.mag();
-            const canLand = Math.abs(rocketAngle * r2d) < maxLandingAngle && Math.abs(angle * r2d) < maxLandingDelta && speed < maxLandingSpeed;
+            const canLand = Math.abs(rocketAngle * r2d) < maxLandingAngle && Math.abs(adjustedSurfaceAngle * r2d) < maxLandingDelta && speed < maxLandingSpeed;
 
             if (col.distance < 0) {
                 const offset = p5.Vector.mult(col.normal, col.distance); // How far down in the ground
@@ -180,7 +180,7 @@ class RigidBody extends Entity {
         this.acceleration = p5.Vector.div(this.force, this.mass);
         this.pendingForce = createVector(0, 0);
         this.velocity.add(p5.Vector.mult(this.acceleration, dt));
-        this.position.add(p5.Vector.mult(this.velocity, dt * 10));
+        this.position.add(p5.Vector.mult(this.velocity, dt * 10)); // Multiply by 10, to speedup. TODO: scale terrain and rocket properly
         this.angularVelocity += this.angularAcceleration * dt;
         this.angle += this.angularVelocity * dt;
 
@@ -188,16 +188,16 @@ class RigidBody extends Entity {
         this.angularVelocity *= 0.99; // Air friction
     }
 
-    draw() {
+    draw() {        
         if (this.image) {
             const w2 = this.width / 2;
             const h2 = this.height / 2;
-            push()
+            push();
             translate(this.position.x + w2, this.position.y + h2);
             rotate(this.angle);
             imageMode(CENTER);
             image(this.image, 0, 0, this.width, this.height)
-            pop()
+            pop();
         }
 
         if (window.debug) {
@@ -240,7 +240,7 @@ class Rocket extends RigidBody {
     }
 
     update() {
-        const altitude = Math.round(abs(this.position.y + this.height - height));
+        const altitude = Math.round(abs(this.position.y + this.height - height) / 10); // Divide by 10 to scale down speed up position when printing to screen. See line 46.
         const velocity = Math.round(p5.Vector.mag(this.velocity));
         const acceleration = Math.round(p5.Vector.mag(this.acceleration) * 100) / 100 * Math.sign(-this.acceleration.y);
         const angularVelocity = Math.round(this.angularVelocity * 10) / 10;
