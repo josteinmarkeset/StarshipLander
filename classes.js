@@ -9,10 +9,13 @@ class World {
 
     update() {
         this.gravity = worldGravity;
+        
+        for (const i in this.entities) {
+            this.entities[i].update();            
+        }
 
         for (const i in this.entities) {
-            this.entities[i].update();
-            this.entities[i].draw();
+            this.entities[i].draw();      
         }
 
         this.updateCollision();
@@ -29,6 +32,8 @@ class World {
     updateCollision() {
         for (const i in this.rocket.collisionPoints) {
             const col = this.testCollision(this.rocket.getCollisionPoint(i));
+
+            if(!col) return;
 
             const r2d = 180 / Math.PI; //Radians to degrees
             const surfaceAngle = col.normal.heading() - Math.PI / 2;
