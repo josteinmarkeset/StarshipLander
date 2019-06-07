@@ -278,8 +278,13 @@ class Rocket extends RigidBody {
 
         // Space bar pressed
         if (keyIsDown(32)) {
-            this.fireThruster();
-            this.playEngineSound(true);
+            if(this.thrustForce) {
+                this.fireThruster();
+                this.playEngineSound(true);
+            }
+            else{
+                this.playEngineSound(false);
+            }
         }
         else {
             this.playEngineSound(false);
@@ -315,6 +320,8 @@ class Rocket extends RigidBody {
         if (getAudioContext().state !== 'running')
             getAudioContext().resume();
 
+        engineLoopSound.volume = (this.thrustForce - thrustForceMin) / (thrustForceMax - thrustForceMin); 
+
         if (!engineLoopSound.readyState) return;
         if (shouldPlay) {
             if (engineLoopSound.currentTime >= 6) {
@@ -340,7 +347,7 @@ class Rocket extends RigidBody {
     playGasSound(shouldPlay) {
         if (getAudioContext().state !== 'running')
             getAudioContext().resume();
-
+        
         if (!coldGasSound.readyState) return;
         if (shouldPlay) {
             if (coldGasSound.currentTime >= 2) {
@@ -348,6 +355,7 @@ class Rocket extends RigidBody {
             }
 
             if (coldGasSound.paused) {
+                coldGasSound.volume = 1/2;
                 coldGasSound.play();
             }                       
         }
@@ -361,10 +369,6 @@ class Rocket extends RigidBody {
                 coldGasSound.currentTime = 0;
             }
         }
-    }
-
-    hasEnded(soundFile) {
-        soundFile.duration() - soundFile.currentTime();
     }
 
     // Fire main engine
@@ -381,12 +385,15 @@ class Rocket extends RigidBody {
         const fromColor = color(122, 134, 255);
         const toColor = color(252, 164, 76);
 
+        let scaledVelocityX = this.velocity.x / 10;
+        let scaledVelocityY = this.velocity.y / 10;
+        const particleVelocityVector = createVector(scaledVelocityX, scaledVelocityY);
         const particleAccelerationVector = p5.Vector.div(directionalForceVector, -1000000)
 
         this.thrustParticles.origin = this.getCollisionPoint(3);
-        this.thrustParticles.addParticle(particleAccelerationVector, fromColor, toColor, 1.5);
-        this.thrustParticles.addParticle(particleAccelerationVector, fromColor, toColor, 1.5);
-        this.thrustParticles.addParticle(particleAccelerationVector, fromColor, toColor, 1.5);
+        this.thrustParticles.addParticle(particleVelocityVector, particleAccelerationVector, fromColor, toColor, 1.5);
+        this.thrustParticles.addParticle(particleVelocityVector, particleAccelerationVector, fromColor, toColor, 1.5);
+        this.thrustParticles.addParticle(particleVelocityVector, particleAccelerationVector, fromColor, toColor, 1.5);
     }
 
     // Fire right control thruster
@@ -394,10 +401,13 @@ class Rocket extends RigidBody {
         this.angularAcceleration -= 0.5;
         const gasAcceleration = -this.angularAcceleration * 5;
 
+        let scaledVelocityY = this.velocity.y / 6;
+        
         const xComp = Math.cos(this.angle);
         const yComp = Math.sin(this.angle);
-
+        
         const direction = createVector(xComp, yComp);
+        const particleVelocityVector = createVector(0, scaledVelocityY);
         const particleAccelerationVector = createVector(direction.x * gasAcceleration, direction.y * gasAcceleration)
 
         /* Gas thruster particles */
@@ -406,7 +416,7 @@ class Rocket extends RigidBody {
         const toColor = color(255, 255, 255, 0);
 
         this.rightGasParticles.origin = this.getCollisionPoint(2);
-        this.rightGasParticles.addParticle(particleAccelerationVector, fromColor, toColor, 0.75);
+        this.rightGasParticles.addParticle(particleVelocityVector, particleAccelerationVector, fromColor, toColor, 0.75);
     }
 
     // Fire left control thruster
@@ -414,10 +424,13 @@ class Rocket extends RigidBody {
         this.angularAcceleration += 0.5;
         const gasAcceleration = -this.angularAcceleration * 5;
 
+        let scaledVelocityY = this.velocity.y / 6;
+        
         const xComp = Math.cos(this.angle);
         const yComp = Math.sin(this.angle);
-
+        
         const direction = createVector(xComp, yComp);
+        const particleVelocityVector = createVector(0, scaledVelocityY);
         const particleAccelerationVector = createVector(direction.x * gasAcceleration, direction.y * gasAcceleration)
 
         /* Gas thruster particles */
@@ -426,14 +439,14 @@ class Rocket extends RigidBody {
         const toColor = color(255, 255, 255, 0);
 
         this.rightGasParticles.origin = this.getCollisionPoint(1);
-        this.rightGasParticles.addParticle(particleAccelerationVector, fromColor, toColor, 0.75);
+        this.rightGasParticles.addParticle(particleVelocityVector, particleAccelerationVector, fromColor, toColor, 0.75);
     }
 }
 
 class Particle {
-    constructor(position, acceleration, fromColor, toColor, lifespan) {
+    constructor(position, velocity, acceleration, fromColor, toColor, lifespan) {
         this.acceleration = createVector(acceleration.x, acceleration.y);
-        this.velocity = createVector(random(-1, 1), random(-1, 0));
+        this.velocity = createVector(random(-1, 1) + velocity.x, random(-1, 0) + velocity.y);
         this.position = position.copy();
         this.fromColor = fromColor;
         this.toColor = toColor;
@@ -489,7 +502,7 @@ class ParticleSystem {
     }
 
     // Spawn particle
-    addParticle(acceleration, fromColor, toColor, lifespan) {
-        this.particles.push(new Particle(this.origin, acceleration, fromColor, toColor, lifespan));
+    addParticle(velocity, acceleration, fromColor, toColor, lifespan) {
+        this.particles.push(new Particle(this.origin, velocity, acceleration, fromColor, toColor, lifespan));
     }
 }
