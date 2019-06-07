@@ -176,7 +176,8 @@ class RigidBody extends Entity {
     }
 
     update() {
-        if (this.position.x + this.width / 2 < 0 || this.position.x - this.width / 2 > width)
+        // Restart if out of screen
+        if (this.position.x + this.width * 2 < 0 || this.position.x - this.width / 2 > width)
             this.world.reset();
 
         let dt = getDeltaTime();
