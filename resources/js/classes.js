@@ -2,6 +2,7 @@ class World {
     constructor(name = "", gravity = 9.81) {
         this.name = name;
         this.gravity = gravity;
+        this.seed = 0;
 
         worldGravity = this.gravity;
         this.reset();
@@ -22,6 +23,8 @@ class World {
     }
 
     reset() {
+        this.seed = getRandomArbitrary(0, 1000);
+
         this.entities = [];
         this.planet = new Planet(this, this.name, earthTexture, createVector(0, height));
         this.rocket = new Rocket(this, "Starship", starshipImage, createVector(width / 2, 0));
@@ -130,6 +133,7 @@ class Planet extends Entity {
     }
 
     generateHeightmap() {
+        noiseSeed(this.world.seed);
         this.heightmap = []
         for (let i = 0; i < width; i++) {
             this.heightmap.push(noise(i / (1000 * terrainSmoothing)) * height / 2);

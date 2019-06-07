@@ -108,3 +108,8 @@ function distToSegmentSigned(p, v, w) {
     return distToSegment(p, v, w) * Math.sign(d);
 }
 // ================================================================================================
+
+// https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
