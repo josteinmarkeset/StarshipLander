@@ -177,7 +177,7 @@ class RigidBody extends Entity {
 
     update() {
         // Restart if out of screen
-        if (this.position.x + this.width * 2 < 0 || this.position.x - this.width / 2 > width)
+        if (this.position.x + this.width * 2 < 0 || this.position.x - this.width / 2 > width || this.position.y + this.height > height)
             this.world.reset();
 
         let dt = getDeltaTime();
@@ -384,7 +384,7 @@ class Rocket extends RigidBody {
         const fromColor = color(122, 134, 255);
         const toColor = color(252, 164, 76);
 
-        let scaledVelocityX = this.velocity.x / 10;
+        let scaledVelocityX = this.velocity.x / 12;
         let scaledVelocityY = this.velocity.y / 10;
         const particleVelocityVector = createVector(scaledVelocityX, scaledVelocityY);
         const particleAccelerationVector = p5.Vector.div(directionalForceVector, -1000000)
