@@ -108,7 +108,7 @@ class Entity {
 
     update() { }
 
-    draw() {
+    draw() {        
         if (this.image)
             image(this.image, this.position.x, this.position.y)
     }
@@ -138,7 +138,7 @@ class Planet extends Entity {
         noiseSeed(this.world.seed);
         this.heightmap = []
         for (let i = 0; i < width; i++) {
-            this.heightmap.push(noise(i / (1000 * terrainSmoothing)) * height / 2);
+            this.heightmap.push(noise(i / (500 * terrainSmoothing)) * height / 4);
         }
 
         let minValue = Math.min.apply(Math, this.heightmap);
@@ -195,16 +195,14 @@ class RigidBody extends Entity {
         this.angularVelocity *= 0.99; // Air friction
     }
 
-    draw() {
+    draw() {        
         if (this.image) {
             const w2 = this.width / 2;
             const h2 = this.height / 2;
-            push();
             translate(this.position.x + w2, this.position.y + h2);
             rotate(this.angle);
             imageMode(CENTER);
-            image(this.image, 0, 0, this.width, this.height)
-            pop();
+            image(this.image, 0, 0, this.width, this.height);
         }
 
         if (window.debug) {
