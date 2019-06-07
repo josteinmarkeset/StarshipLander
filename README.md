@@ -1,7 +1,8 @@
 # Starship Lander
 
 Starship Lander is a rocket landing game. The user can control the rocket, and manipulate simulation variables.
-If you don't wish to install the application, you may try the demo here: [Demo](https://josteinmarkeset.github.io/StarshipLander/)
+
+If you don't wish to install the application, you may try the demo [here](https://josteinmarkeset.github.io/StarshipLander/).
 
 ## Installation
 
