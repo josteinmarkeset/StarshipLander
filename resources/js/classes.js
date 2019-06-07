@@ -10,13 +10,13 @@ class World {
 
     update() {
         this.gravity = worldGravity;
-        
+
         for (const i in this.entities) {
-            this.entities[i].update();            
+            this.entities[i].update();
         }
 
         for (const i in this.entities) {
-            this.entities[i].draw();      
+            this.entities[i].draw();
         }
 
         this.updateCollision();
@@ -36,7 +36,7 @@ class World {
         for (const i in this.rocket.collisionPoints) {
             const col = this.testCollision(this.rocket.getCollisionPoint(i));
 
-            if(!col) return;
+            if (!col) return;
 
             const r2d = 180 / Math.PI; //Radians to degrees
             const surfaceAngle = col.normal.heading() - Math.PI / 2;
@@ -51,9 +51,11 @@ class World {
                 this.rocket.velocity.mult(0);
 
                 if (canLand) {
+                    engineLoopSound.pause();
                     alert("Nice landing!");
                 }
                 else {
+                    engineLoopSound.pause();
                     alert("You crashed!");
                 }
 
@@ -192,7 +194,7 @@ class RigidBody extends Entity {
         this.angularVelocity *= 0.99; // Air friction
     }
 
-    draw() {        
+    draw() {
         if (this.image) {
             const w2 = this.width / 2;
             const h2 = this.height / 2;
@@ -241,6 +243,13 @@ class Rocket extends RigidBody {
         this.thrustParticles = new ParticleSystem(this.getCollisionPoint(3));
         this.rightGasParticles = new ParticleSystem(this.getCollisionPoint(3));
         this.leftGasParticles = new ParticleSystem(this.getCollisionPoint(3));
+
+        // Random difficulity spawn
+        if(startNudge) {            
+            this.velocity = createVector((Math.random() * 2 - 1) * maxNudgeVelocityX, Math.random() * maxNudgeVelocityY);
+            this.angle = (Math.random() - 1/2) * maxNudgeAngle;
+            this.angularVelocity = (Math.random() * 2 - 1) * maxNudgeAngularVelocity;
+        }
     }
 
     update() {
@@ -270,28 +279,92 @@ class Rocket extends RigidBody {
         // Space bar pressed
         if (keyIsDown(32)) {
             this.fireThruster();
+            this.playEngineSound(true);
         }
+        else {
+            this.playEngineSound(false);
+        }
+
+        let shouldPlayGasSound = false;
 
         // A pressed
         if (keyIsDown(65)) {
             this.rightControlThruster();
+            shouldPlayGasSound = true;
         }
 
         // D pressed
         if (keyIsDown(68)) {
             this.leftControlThruster();
+            shouldPlayGasSound = true;
         }
 
-        // X pressed
-        if (keyIsDown(88)) {
-            this.world.reset();
-        }
+        if(shouldPlayGasSound)
+            this.playGasSound(true);
+        else
+            this.playGasSound(false);
 
         this.thrustParticles.run();
         this.rightGasParticles.run();
         this.leftGasParticles.run();
 
         super.update();
+    }
+
+    playEngineSound(shouldPlay) {
+        if (getAudioContext().state !== 'running')
+            getAudioContext().resume();
+
+        if (!engineLoopSound.readyState) return;
+        if (shouldPlay) {
+            if (engineLoopSound.currentTime >= 6) {
+                engineLoopSound.currentTime = 1;
+            }
+
+            if (engineLoopSound.paused) {
+                engineLoopSound.play();
+            }                       
+        }
+        else {
+            if (engineLoopSound.ended) {
+                engineLoopSound.play();
+                engineLoopSound.pause();
+            }
+            else {
+                engineLoopSound.pause();
+                engineLoopSound.currentTime = 0;
+            }
+        }
+    }
+
+    playGasSound(shouldPlay) {
+        if (getAudioContext().state !== 'running')
+            getAudioContext().resume();
+
+        if (!coldGasSound.readyState) return;
+        if (shouldPlay) {
+            if (coldGasSound.currentTime >= 2) {
+                coldGasSound.currentTime = 1;
+            }
+
+            if (coldGasSound.paused) {
+                coldGasSound.play();
+            }                       
+        }
+        else {
+            if (coldGasSound.ended) {
+                coldGasSound.play();
+                coldGasSound.pause();
+            }
+            else {
+                coldGasSound.pause();
+                coldGasSound.currentTime = 0;
+            }
+        }
+    }
+
+    hasEnded(soundFile) {
+        soundFile.duration() - soundFile.currentTime();
     }
 
     // Fire main engine

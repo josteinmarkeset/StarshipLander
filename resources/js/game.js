@@ -1,6 +1,14 @@
 // ==========GLOBALS StART ===========
 let enableDebugging = false;
+let startNudge = true;
 
+// Nudge settings
+let maxNudgeVelocityX = 20
+let maxNudgeVelocityY = 20
+let maxNudgeAngle = Math.PI / 2
+let maxNudgeAngularVelocity = 1/2;
+
+// Rocket settings
 var rocketMass = 85000; // Mass of Starship from: https://en.wikipedia.org/wiki/Starship_(rocket)
 var rocketMassMin = 0;
 var rocketMassMax = 1000000;
@@ -13,21 +21,25 @@ var thrustForce = 1993000; // Thrust force of a raptor engine: https://en.wikipe
 var thrustForceMin = 0;
 var thrustForceMax = 5000000;
 
+// World settings
 var worldGravity = 9.81;
 var worldGravityMax = 20;
 var worldGravityStep = 0.1;
 
+// Misc settings
 let terrainSmoothing = 0.8; // Range is 0-1
 let fontSize = 18;
 // ========== GLOBALS END ============
 
 // To be assigned
 let gui;
+let font;
 let world;
 let earthTexture;
 let starshipImage;
 let backgroundImage;
-let font;
+let engineLoopSound;
+let coldGasSound;
 
 // Delta-time
 let lastFrameTime = window.performance.now();
@@ -38,6 +50,9 @@ function preload() {
     starshipImage = loadImage('resources/img/starship.png');
     backgroundImage = loadImage('resources/img/bg.jpg');
     font = loadFont('resources/font/SourceSansPro-Regular.ttf');
+
+    engineLoopSound = new Audio('resources/audio/engine_loop.wav');
+    coldGasSound = new Audio('resources/audio/cold_gas.wav');
 }
 
 // Initialize application
@@ -51,6 +66,10 @@ function setup() {
     textFont(font);
     textSize(fontSize);
     textAlign(LEFT, CENTER);
+
+    userStartAudio().then(function () {
+
+    });
 }
 
 // Called every frame
@@ -66,6 +85,12 @@ function enableDebug(shouldEnable = true) {
     enableDebugging = shouldEnable;
 
     console.log(shouldEnable ? "Debugging mode enabled." : "Debugging mode disabled.");
+}
+
+function keyPressed() {
+    if(keyCode === 88) {
+        reset();
+    }
 }
 
 // Restart
