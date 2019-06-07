@@ -4,7 +4,7 @@ let startNudge = true;
 
 // Nudge settings
 let maxNudgeVelocityX = 20
-let maxNudgeVelocityY = 20
+let maxNudgeVelocityY = 25
 let maxNudgeAngle = Math.PI / 2
 let maxNudgeAngularVelocity = 1/2;
 
